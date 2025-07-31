@@ -127,7 +127,7 @@ def on_device_removed(device: EpsonDevice | None) -> None:
 async def main():
     logging.basicConfig()
     level = os.getenv("UC_LOG_LEVEL", "DEBUG").upper()
-    logging.getLogger("uc_intg_epson_pj").setLevel(level)
+    logging.getLogger("uc_intg_epson_pjlink").setLevel(level)
     
     config.devices = config.Devices(
         api.config_dir_path, on_device_added, on_device_removed
