@@ -78,6 +78,6 @@ The driver will now be discoverable by your Unfolded Circle remote on the local 
 
 This integration was made possible by the hard work and inspiration from others in the Unfolded Circle community.
 
-* **Jack Powell** for the excellent [uc-intg-jvc](https://github.com/JackJPowell/uc-intg-jvc) integration, which served as the architectural model for this project.
-* **`kennymc-c`** for the [ucr2-integration-requests](https://github.com/kennymc-c/ucr2-integration-requests) project, which was the initial inspiration for a text-over-TCP integration.
+* [**Jack Powell**](https://github.com/JackJPowell) for the excellent [uc-intg-jvc](https://github.com/JackJPowell/uc-intg-jvc) integration, which served as the architectural model for this project.
+* [**kennymc-c**](https://github.com/kennymc-c) for the [ucr2-integration-requests](https://github.com/kennymc-c/ucr2-integration-requests) project, which was the initial inspiration for a text-over-TCP integration.
 * **The Unfolded Circle Team** for creating a fantastic product and providing the [ucapi library](https://github.com/unfoldedcircle/integration-python-library) for developers.
