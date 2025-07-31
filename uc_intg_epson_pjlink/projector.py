@@ -1,18 +1,11 @@
-# uc_intg_epson_pj/projector.py
-
 import asyncio
 import logging
 import hashlib
 from enum import IntEnum, StrEnum
 from asyncio import AbstractEventLoop
 from pyee.asyncio import AsyncIOEventEmitter
-
-try:
-    from .config import EpsonDevice
-    from . import const
-except ImportError:
-    from config import EpsonDevice
-    import const
+from config import EpsonDevice
+import const
 
 _LOGGER = logging.getLogger(__name__)
 PORT = 4352
@@ -58,7 +51,6 @@ class EpsonProjector:
     async def update(self):
         power_status_raw = await self._get_power_status()
         new_state = PowerState.ON if power_status_raw == 'on' else PowerState.STANDBY
-        
         if self._state != new_state:
             self._state = new_state
             self.events.emit(EVENTS.UPDATE, self.identifier, {"state": self._state})
@@ -80,13 +72,10 @@ class EpsonProjector:
             try:
                 host = self._device_config.address
                 password = self._device_config.password if self._device_config.password else ""
-                
                 reader, writer = await asyncio.wait_for(
                     asyncio.open_connection(host, PORT), timeout=3.0
                 )
-                
                 initial_response = (await reader.read(100)).decode('utf-8')
-                
                 if "PJLINK 1" in initial_response:
                     nonce = initial_response.split(' ')[1].strip()
                     auth_hash = hashlib.md5((password + nonce).encode('utf-8')).hexdigest()
@@ -95,15 +84,12 @@ class EpsonProjector:
                     full_command = f"{auth_hash}{command}\r"
                 else:
                     full_command = f"{command}\r"
-
                 writer.write(full_command.encode('utf-8'))
                 await writer.drain()
-                
                 response_data = await asyncio.wait_for(reader.read(100), timeout=3.0)
                 decoded_response = response_data.decode('utf-8').strip()
                 _LOGGER.debug(f"[{self.name}] Sent '{command}', Received '{decoded_response}'")
                 return decoded_response
-                
             except Exception as e:
                 _LOGGER.error(f"[{self.name}] PJLink communication error on command '{command}': {e}")
                 return None

@@ -1,5 +1,3 @@
-# uc_intg_epson_pj/setup.py
-
 import logging
 import re
 from ipaddress import ip_address
@@ -15,12 +13,8 @@ from ucapi import (
     IntegrationSetupError,
 )
 
-try:
-    from . import config
-    from .config import EpsonDevice
-except ImportError:
-    import config
-    from config import EpsonDevice
+import config
+from config import EpsonDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,13 +54,10 @@ async def driver_setup_handler(msg: SetupDriver) -> SetupAction:
     if isinstance(msg, DriverSetupRequest):
         config.devices.clear()
         return _user_input_manual
-        
     if isinstance(msg, UserDataResponse):
         return await _handle_creation(msg)
-        
     if isinstance(msg, AbortDriverSetup):
         _LOGGER.info("Setup was aborted.")
-
     return SetupError()
 
 async def _handle_creation(msg: UserDataResponse) -> SetupComplete | SetupError:
@@ -76,7 +67,6 @@ async def _handle_creation(msg: UserDataResponse) -> SetupComplete | SetupError:
 
     if not all([ip, name]):
         return SetupError(IntegrationSetupError.INVALID_INPUT)
-
     try:
         ip_address(ip)
     except ValueError:
