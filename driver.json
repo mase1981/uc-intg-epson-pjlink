@@ -1,0 +1,35 @@
+{
+  "driver_id": "uc-intg-epson-pj",
+  "version": "1.0.0",
+  "min_core_api": "0.3.1",
+  "name": {
+    "en": "Epson Projector Controls"
+  },
+  "icon": "uc:projector",
+  "description": {
+    "en": "Control your network-connected Epson Projector via the PJLink protocol."
+  },
+  "developer": {
+    "name": "Meir Miyara"
+  },
+  "setup_data_schema": {
+    "title": {
+      "en": "Epson Projector Setup"
+    },
+    "settings": [
+      {
+        "id": "info",
+        "label": {
+          "en": "Setup Process"
+        },
+        "field": {
+          "label": {
+            "value": {
+              "en": "This integration allows you to control Epson projectors on your network using the PJLink protocol. You will be asked to provide the projector's IP address on the next screen."
+            }
+          }
+        }
+      }
+    ]
+  }
+}
