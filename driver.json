@@ -1,6 +1,6 @@
 {
   "driver_id": "uc-intg-epson-pj",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "min_core_api": "0.3.1",
   "name": {
     "en": "Epson Projector Controls"
