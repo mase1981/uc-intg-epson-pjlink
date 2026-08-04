@@ -13,6 +13,12 @@ import logging
 from dataclasses import dataclass, field
 
 from uc_intg_epson_pjlink import const
+from uc_intg_epson_pjlink.transport import (
+    ProjectorIdentity,
+    ProjectorStatus,
+    Transport,
+    TransportAuthError,
+)
 
 _LOG = logging.getLogger(__name__)
 
@@ -219,3 +225,78 @@ class PJLinkClient:
     async def send_raw(self, command: str) -> str:
         """Send a raw PJLink command string (e.g. ``%1INPT 32``)."""
         return await self._send(command)
+
+
+class PJLinkTransport(Transport):
+    """Transport adapter around :class:`PJLinkClient`."""
+
+    name = "pjlink"
+    supports_color_mode = False
+
+    def __init__(self, host: str, port: int = const.PJLINK_PORT, password: str = "") -> None:
+        self._client = PJLinkClient(host, port, password)
+
+    async def probe(self) -> bool:
+        try:
+            return await self._client.test()
+        except PJLinkAuthError as err:
+            raise TransportAuthError(str(err)) from err
+        except Exception:  # pylint: disable=broad-exception-caught
+            return False
+
+    async def get_identity(self) -> ProjectorIdentity:
+        try:
+            ident = await self._client.get_identity()
+        except PJLinkAuthError as err:
+            raise TransportAuthError(str(err)) from err
+        return ProjectorIdentity(
+            name=ident.name,
+            manufacturer=ident.manufacturer,
+            product=ident.product,
+            serial=ident.serial,
+            sw_version=ident.sw_version,
+            rec_resolution=ident.rec_resolution,
+            filter_model=ident.filter_model,
+            source_names=[
+                const.PJLINK_INPUT_NAMES.get(c, f"Input {c}") for c in ident.input_codes
+            ],
+        )
+
+    async def poll(self) -> ProjectorStatus:
+        try:
+            st = await self._client.poll()
+        except PJLinkAuthError as err:
+            raise TransportAuthError(str(err)) from err
+        source = ""
+        if st.input_code:
+            source = const.PJLINK_INPUT_NAMES.get(st.input_code, f"Input {st.input_code}")
+        return ProjectorStatus(
+            power=st.power,
+            reachable=st.reachable,
+            source=source,
+            av_muted=st.av_muted,
+            lamp_hours=st.lamp_hours,
+            errors=st.errors,
+            has_error=st.has_error,
+        )
+
+    async def power_on(self) -> None:
+        await self._client.power_on()
+
+    async def power_off(self) -> None:
+        await self._client.power_off()
+
+    async def select_source(self, name: str) -> bool:
+        code = const.PJLINK_INPUT_NAMES_INV.get(name)
+        if code is None and name in const.PJLINK_INPUT_NAMES:
+            code = name
+        if code is None:
+            return False
+        await self._client.select_input(code)
+        return True
+
+    async def set_av_mute(self, muted: bool) -> None:
+        await self._client.set_av_mute(muted)
+
+    async def send_raw(self, command: str) -> str:
+        return await self._client.send_raw(command)

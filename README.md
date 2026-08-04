@@ -1,6 +1,6 @@
 # Epson Projector Integration for Unfolded Circle Remote 2/3
 
-Control your **network-connected Epson projectors** directly from your Unfolded Circle Remote 2 or Remote 3. Power, input/source switching, AV-mute, colour mode, Wake-on-LAN, and rich status sensors (model, serial, firmware, lamp/light-source hours, error status) - all over the local network via **PJLink**, with optional **Epson Web Control**. No IR emitters required.
+Control your **network-connected Epson projectors** directly from your Unfolded Circle Remote 2 or Remote 3. Power, input/source switching, AV-mute, colour mode, Wake-on-LAN, and rich status sensors (model, serial, firmware, lamp/light-source hours, error status) - all over the local network. Supports **PJLink** (TCP 4352), Epson's native **ESC/VP.net** (TCP 3629), and **Epson Web Control** (HTTP), auto-detected or chosen at setup. No IR emitters required.
 
 ![Epson](https://img.shields.io/badge/Epson-Projector-blue)
 [![GitHub Release](https://img.shields.io/github/v/release/mase1981/uc-intg-epson-pjlink?style=flat-square)](https://github.com/mase1981/uc-intg-epson-pjlink/releases)
@@ -15,7 +15,13 @@ Control your **network-connected Epson projectors** directly from your Unfolded 
 
 ## Supported Devices
 
-Network-connected Epson projectors that support **PJLink** (enabled by default on most models), including the **Home Cinema / EH-TW** series, the **LS / QB laser** flagships (e.g. LS12000, QB1000), and **EB / PowerLite** business projectors. The model, serial and firmware are detected automatically from the projector. Optional **Epson Web Control** features (colour mode) require the projector's Web Control password.
+Network-connected Epson projectors, including the **Home Cinema / EH-TW** series, the **LS / QB laser** flagships (e.g. LS12000, QB1000), and **EB / PowerLite** business projectors. The integration speaks three protocols and picks whichever the projector supports:
+
+- **PJLink** (TCP 4352) — common on business/large-venue models and many home models.
+- **ESC/VP.net** (TCP 3629) — Epson's native protocol; used by consumer home-cinema models that don't expose PJLink.
+- **Web Control** (HTTP) — the Epson web interface; also usable for control.
+
+The projector must have **network control enabled** and be reachable on the LAN. Model, serial and firmware are auto-detected where the protocol provides them.
 
 ## Features
 
@@ -25,6 +31,7 @@ Network-connected Epson projectors that support **PJLink** (enabled by default o
 - **🎨 Colour mode** - pick the picture preset (Cinema, Natural, Dynamic, …) via Web Control (added only when a Web Control password is provided).
 - **📊 Status sensors** - Lamp / Light-Source Hours, Model, Serial Number, Firmware, Input, and Status (error summary).
 - **⏰ Wake-on-LAN** - optional magic-packet wake so the projector can be powered on from deep standby.
+- **🔀 Multiple protocols** - PJLink, ESC/VP.net, or Web Control, with an **Auto-detect** option that probes and locks onto whichever the projector answers.
 - **🔎 Automatic model detection** - laser models are labelled "Light Source Hours", lamp models "Lamp Hours".
 - **Multi-device** - add each projector on your network.
 
@@ -93,10 +100,11 @@ docker run -d --name uc-intg-epson-pjlink --restart unless-stopped --network hos
 1. Start setup and enter your projector's details:
    - **Projector Name** - a friendly name (e.g. "Cinema Projector").
    - **IP Address** and **PJLink Port** (default `4352`).
+   - **Control Protocol** - **Auto-detect** (recommended), or force **PJLink**, **ESC/VP.net**, or **Web Control**.
    - **PJLink Password** - optional.
-   - **Web Control Password** - optional; unlocks colour-mode control.
+   - **Web Control / ESC-VP Password** - optional; needed if the projector has a monitor/Web Control password set, and unlocks colour-mode control.
    - **MAC Address** - optional; enables Wake-on-LAN.
-2. The integration validates the connection, auto-detects the model, and creates the entities.
+2. The integration probes the projector, auto-detects the model, and creates the entities. (An unreachable projector still completes setup and connects later.)
 3. Repeat setup to add additional projectors.
 
 For each projector the integration creates:
@@ -115,8 +123,9 @@ For each projector the integration creates:
 
 | Symptom | Fix |
 |---------|-----|
-| "Connection refused" / cannot connect | Ensure PJLink is enabled and the projector is reachable. Many Epson models close the network in standby - set Standby/Network to **"Communication On"**, and/or add the MAC address for Wake-on-LAN. |
-| Setup fails with an authorization error | The projector has a PJLink password set - enter it during setup. |
+| "Connection refused" / cannot connect | The projector isn't answering the chosen protocol. Leave **Control Protocol** on **Auto-detect** so it tries PJLink, ESC/VP.net, and Web Control. Ensure network control is enabled on the projector and the port isn't blocked by a VLAN/firewall (4352 PJLink, 3629 ESC/VP.net, 80 Web Control). Many Epson models close the network in standby - set Standby/Network to **"Communication On"**, and/or add the MAC address for Wake-on-LAN. |
+| Works with Home Assistant but not here | HA uses ESC/VP.net or Web Control for consumer models. Set **Control Protocol** to **ESC/VP.net** (or **Auto-detect**), and enter the monitor/Web Control password if one is set. Note: models with no network port at all (e.g. some entry-level home units) can only be controlled by IR. |
+| Setup fails with an authorization error | The projector has a password set - enter the PJLink or Web Control/ESC-VP password during setup. |
 | Colour Mode entity missing | It is only created when a **Web Control password** is provided at setup. |
 | Sensors show "N/A" while the projector is off | Some values (input, colour mode) are only available while the projector is powered on. |
 | Source switch does nothing | Only inputs the projector actually reports (PJLink `INST`) are selectable. |

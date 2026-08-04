@@ -79,6 +79,7 @@ PJLINK_INPUT_NAMES = {
     "56": "Wireless",
     "80": "HDBaseT",
 }
+PJLINK_INPUT_NAMES_INV = {v: k for k, v in PJLINK_INPUT_NAMES.items()}
 
 # -- Epson Web Control (HTTP) color/picture modes ----------------------------
 # CMODE reply code -> display name. Superset from projector_pilot + HA.
@@ -122,3 +123,34 @@ WEB_ASPECT_MODES = {
 
 # Default Web Control digest username
 WEB_USERNAME = "EPSONWEB"
+
+# -- ESC/VP21 command set (shared by ESC/VP.net TCP and Web Control HTTP) -----
+# Power reply codes for "PWR?" -> "PWR=<code>"
+ESCVP_POWER = {
+    "00": STATE_OFF,       # standby, network off
+    "01": STATE_ON,        # lamp on
+    "02": STATE_WARMING,   # warm-up
+    "03": STATE_COOLING,   # cool-down
+    "04": STATE_OFF,       # standby, network on
+    "05": STATE_OFF,       # abnormal standby
+    "09": STATE_OFF,       # A/V standby
+}
+
+# ESC/VP21 source reply code -> friendly name (verified codes from Epson docs
+# and projector_pilot). Set with "SOURCE <code>".
+ESCVP_SOURCE_NAMES = {
+    "10": "Computer 1",
+    "20": "Computer 2",
+    "30": "HDMI 1",
+    "40": "Video",
+    "41": "S-Video",
+    "42": "Component",
+    "52": "USB",
+    "53": "LAN",
+    "56": "Screen Mirroring",
+    "80": "HDBaseT",
+    "A0": "HDMI 2",
+    "B0": "SDI",
+    "D0": "WirelessHD",
+}
+ESCVP_SOURCE_NAMES_INV = {v: k for k, v in ESCVP_SOURCE_NAMES.items()}

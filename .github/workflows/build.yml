@@ -51,6 +51,7 @@ jobs:
                 --collect-all certifi \
                 --hidden-import uc_intg_epson_pjlink.driver \
                 --hidden-import uc_intg_epson_pjlink.device \
+                --hidden-import uc_intg_epson_pjlink.transport \
                 --hidden-import uc_intg_epson_pjlink.pjlink \
                 --hidden-import uc_intg_epson_pjlink.webcontrol \
                 --hidden-import uc_intg_epson_pjlink.escvpnet \

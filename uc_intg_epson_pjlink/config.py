@@ -22,6 +22,7 @@ class EpsonConfig:
     identifier: str = ""
     name: str = ""
     host: str = ""
+    protocol: str = "auto"      # auto | pjlink | escvpnet | webcontrol
     pjlink_port: int = const.PJLINK_PORT
     pjlink_password: str = ""
     web_password: str = ""      # Web Control (EPSONWEB) password; enables picture control
