@@ -15,6 +15,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import logging
+import re
 
 from uc_intg_epson import const
 from uc_intg_epson.transport import (
@@ -94,25 +95,50 @@ class ESCVPNetTransport(Transport):
             await self._close_locked()
 
     async def _command(self, verb: str) -> str | None:
-        """Send one ESC/VP21 verb, return the response value (or None)."""
+        """Send one ESC/VP21 verb and return its echoed response value.
+
+        Queries read until the reply echoing the sent verb (``KEY=value``) is
+        found, discarding any stale data left in the persistent socket. Without
+        this, several commands per poll can desynchronise the socket so that,
+        e.g., ``LAMP?`` returns another command's reply.
+        """
+        verb = verb.strip()
+        is_query = verb.endswith("?")
+        key = verb.split()[0].rstrip("?").upper()
         async with self._lock:
             try:
                 await self._connect()
                 assert self._reader is not None and self._writer is not None
                 self._writer.write(f"{verb}\r".encode("ascii"))
                 await self._writer.drain()
-                raw = await asyncio.wait_for(self._reader.read(256), timeout=_TIMEOUT)
+                if not is_query:
+                    try:
+                        await asyncio.wait_for(self._reader.read(64), timeout=1.5)
+                    except asyncio.TimeoutError:
+                        pass
+                    return ""
+                return await asyncio.wait_for(self._read_echo(key), timeout=_TIMEOUT)
             except TransportAuthError:
                 raise
             except (OSError, asyncio.TimeoutError) as err:
                 await self._close_locked()
                 raise ESCVPNetError(str(err)) from err
-            text = raw.decode("utf-8", errors="replace").strip().rstrip(":").strip()
-            if not text or text.upper().startswith("ERR"):
+
+    async def _read_echo(self, key: str) -> str | None:
+        """Read until ``KEY=value`` appears, draining stale/earlier responses."""
+        assert self._reader is not None
+        pattern = re.compile(re.escape(key) + r"=([^\r\n:]*)", re.IGNORECASE)
+        buffer = ""
+        while True:
+            chunk = await self._reader.read(256)
+            if not chunk:
                 return None
-            if "=" in text:
-                return text.split("=", 1)[1].strip()
-            return text
+            buffer += chunk.decode("utf-8", errors="replace")
+            match = pattern.search(buffer)
+            if match:
+                return match.group(1).strip()
+            if re.search(r"\bERR\b", buffer, re.IGNORECASE):
+                return None
 
     # -- Transport interface ----------------------------------------------
     async def probe(self) -> bool:

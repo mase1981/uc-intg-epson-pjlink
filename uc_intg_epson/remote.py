@@ -55,7 +55,7 @@ class EpsonRemote(RemoteEntity):
         self.subscribe_to_device(device)
 
     async def sync_state(self) -> None:
-        if self._device.state == const.STATE_UNAVAILABLE:
+        if not self._device.available:
             self.update({remote.Attributes.STATE: remote.States.UNAVAILABLE})
             return
         self.update({

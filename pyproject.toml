@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "uc-intg-epson"
-version = "2.1.1"
+version = "2.1.2"
 description = "Epson projector (PJLink + Web Control) integration for Unfolded Circle Remote Two/3"
 readme = "README.md"
 requires-python = ">=3.11"

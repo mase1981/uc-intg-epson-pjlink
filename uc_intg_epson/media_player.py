@@ -55,10 +55,10 @@ class EpsonMediaPlayer(MediaPlayerEntity):
         self.subscribe_to_device(device)
 
     async def sync_state(self) -> None:
-        state = _STATE_MAP.get(self._device.state, media_player.States.UNKNOWN)
-        if state == media_player.States.UNAVAILABLE:
-            self.update({media_player.Attributes.STATE: state})
+        if not self._device.available:
+            self.update({media_player.Attributes.STATE: media_player.States.UNAVAILABLE})
             return
+        state = _STATE_MAP.get(self._device.state, media_player.States.UNKNOWN)
         self.update({
             media_player.Attributes.STATE: state,
             media_player.Attributes.MUTED: self._device.av_muted,

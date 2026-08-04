@@ -47,6 +47,12 @@ class EpsonDevice(PollingDevice):
         self._profile = model_db.detect(device_config.model, device_config.name)
         self._color_mode: str | None = None
         self._identity_loaded = False
+        self._fail_count = 0
+
+    # Keep the last-known state through this many consecutive failed polls
+    # before reporting UNAVAILABLE (projectors drop the network briefly during
+    # power on/off transitions and answer slowly while warming up).
+    FAIL_THRESHOLD = 3
 
     # -- identity ----------------------------------------------------------
     @property
@@ -198,15 +204,31 @@ class EpsonDevice(PollingDevice):
 
     async def _refresh(self) -> None:
         try:
-            self._status = await self._transport.poll()
+            new_status = await self._transport.poll()
         except TransportAuthError:
             _LOG.error("[%s] Authentication failed on %s", self.log_id, self._transport.name)
-            self._status = ProjectorStatus()
-            return
+            new_status = ProjectorStatus()
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.debug("[%s] Poll failed: %s", self.log_id, err)
-            self._status = ProjectorStatus()
-            return
+            new_status = ProjectorStatus()
+
+        if new_status.reachable:
+            # A single command in the poll may transiently fail to read; keep the
+            # last good value rather than flashing "N/A".
+            if new_status.lamp_hours is None:
+                new_status.lamp_hours = self._status.lamp_hours
+            if new_status.color_mode is None and new_status.power in (
+                const.STATE_ON, const.STATE_WARMING
+            ):
+                new_status.color_mode = self._status.color_mode
+            self._status = new_status
+            self._fail_count = 0
+        else:
+            # Tolerate transient drops: keep the last-known state for a few
+            # cycles before declaring the projector UNAVAILABLE.
+            self._fail_count += 1
+            if self._fail_count >= self.FAIL_THRESHOLD:
+                self._status = new_status
 
         on = self._status.power in (const.STATE_ON, const.STATE_WARMING)
         if self._status.color_mode is not None:
