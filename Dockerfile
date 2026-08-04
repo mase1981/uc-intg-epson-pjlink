@@ -17,8 +17,8 @@ ENV UC_INTEGRATION_HTTP_PORT="9090"
 ENV UC_CONFIG_HOME="/config"
 ENV PYTHONUNBUFFERED=1
 
-LABEL org.opencontainers.image.source="https://github.com/mase1981/uc-intg-epson-pjlink"
+LABEL org.opencontainers.image.source="https://github.com/mase1981/uc-intg-epson"
 LABEL org.opencontainers.image.description="Epson projector (PJLink + Web Control) integration for Unfolded Circle Remote"
 LABEL org.opencontainers.image.licenses=MPL-2.0
 
-CMD ["python3", "-u", "-m", "uc_intg_epson_pjlink"]
+CMD ["python3", "-u", "-m", "uc_intg_epson"]

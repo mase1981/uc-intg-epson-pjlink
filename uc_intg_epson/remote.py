@@ -9,9 +9,9 @@ from ucapi import StatusCodes, remote
 from ucapi.ui import Buttons, Size, UiPage, create_btn_mapping, create_ui_icon, create_ui_text
 from ucapi_framework import RemoteEntity
 
-from uc_intg_epson_pjlink import const
-from uc_intg_epson_pjlink.config import EpsonConfig
-from uc_intg_epson_pjlink.device import EpsonDevice
+from uc_intg_epson import const
+from uc_intg_epson.config import EpsonConfig
+from uc_intg_epson.device import EpsonDevice
 
 _LOG = logging.getLogger(__name__)
 

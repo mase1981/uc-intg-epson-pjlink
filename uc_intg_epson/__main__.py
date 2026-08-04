@@ -2,7 +2,7 @@
 
 import asyncio
 
-from uc_intg_epson_pjlink import main
+from uc_intg_epson import main
 
 if __name__ == "__main__":
     asyncio.run(main())

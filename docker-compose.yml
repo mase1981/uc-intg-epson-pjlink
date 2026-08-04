@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  uc-intg-epson-pjlink:
+  uc-intg-epson:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: uc-intg-epson-pjlink
+    container_name: uc-intg-epson
     network_mode: host
     volumes:
       - ./config:/config

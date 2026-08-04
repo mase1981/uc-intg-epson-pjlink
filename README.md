@@ -3,12 +3,12 @@
 Control your **network-connected Epson projectors** directly from your Unfolded Circle Remote 2 or Remote 3. Power, input/source switching, AV-mute, colour mode, Wake-on-LAN, and rich status sensors (model, serial, firmware, lamp/light-source hours, error status) - all over the local network. Supports **PJLink** (TCP 4352), Epson's native **ESC/VP.net** (TCP 3629), and **Epson Web Control** (HTTP), auto-detected or chosen at setup. No IR emitters required.
 
 ![Epson](https://img.shields.io/badge/Epson-Projector-blue)
-[![GitHub Release](https://img.shields.io/github/v/release/mase1981/uc-intg-epson-pjlink?style=flat-square)](https://github.com/mase1981/uc-intg-epson-pjlink/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/mase1981/uc-intg-epson?style=flat-square)](https://github.com/mase1981/uc-intg-epson/releases)
 ![License](https://img.shields.io/badge/license-MPL--2.0-blue?style=flat-square)
-[![GitHub issues](https://img.shields.io/github/issues/mase1981/uc-intg-epson-pjlink?style=flat-square)](https://github.com/mase1981/uc-intg-epson-pjlink/issues)
+[![GitHub issues](https://img.shields.io/github/issues/mase1981/uc-intg-epson?style=flat-square)](https://github.com/mase1981/uc-intg-epson/issues)
 [![Community Forum](https://img.shields.io/badge/community-forum-blue?style=flat-square)](https://unfolded.community/)
 [![Discord](https://badgen.net/discord/online-members/zGVYf58)](https://discord.gg/zGVYf58)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/mase1981/uc-intg-epson-pjlink/total?style=flat-square)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/mase1981/uc-intg-epson/total?style=flat-square)
 [![Buy Me A Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=flat-square)](https://buymeacoffee.com/meirmiyara)
 [![PayPal](https://img.shields.io/badge/PayPal-donate-blue.svg?style=flat-square)](https://paypal.me/mmiyara)
 [![Github Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?&logo=GitHub-Sponsors&logoColor=EA4AAA&style=flat-square)](https://github.com/sponsors/mase1981)
@@ -66,20 +66,20 @@ Control is **fully local** over the projector's network connection:
 
 ### Option 1: Remote Web Interface (Recommended)
 
-1. Download the latest `uc-intg-epson-pjlink-<version>-aarch64.tar.gz` from the [**Releases**](https://github.com/mase1981/uc-intg-epson-pjlink/releases) page.
+1. Download the latest `uc-intg-epson-<version>-aarch64.tar.gz` from the [**Releases**](https://github.com/mase1981/uc-intg-epson/releases) page.
 2. Open your Remote's web interface (`http://your-remote-ip`).
 3. Go to **Settings -> Integrations -> Add Integration -> Install Custom** and upload the `.tar.gz`.
 
 ### Option 2: Docker (Advanced Users)
 
-**Image**: `ghcr.io/mase1981/uc-intg-epson-pjlink:latest`
+**Image**: `ghcr.io/mase1981/uc-intg-epson:latest`
 
 **Docker Compose:**
 ```yaml
 services:
-  uc-intg-epson-pjlink:
-    image: ghcr.io/mase1981/uc-intg-epson-pjlink:latest
-    container_name: uc-intg-epson-pjlink
+  uc-intg-epson:
+    image: ghcr.io/mase1981/uc-intg-epson:latest
+    container_name: uc-intg-epson
     network_mode: host
     volumes:
       - ./config:/config
@@ -92,7 +92,7 @@ services:
 
 **Docker Run:**
 ```bash
-docker run -d --name uc-intg-epson-pjlink --restart unless-stopped --network host -v $(pwd)/config:/config -e UC_CONFIG_HOME=/config -e UC_INTEGRATION_INTERFACE=0.0.0.0 -e UC_INTEGRATION_HTTP_PORT=9090 ghcr.io/mase1981/uc-intg-epson-pjlink:latest
+docker run -d --name uc-intg-epson --restart unless-stopped --network host -v $(pwd)/config:/config -e UC_CONFIG_HOME=/config -e UC_INTEGRATION_INTERFACE=0.0.0.0 -e UC_INTEGRATION_HTTP_PORT=9090 ghcr.io/mase1981/uc-intg-epson:latest
 ```
 
 ## Configuration
@@ -142,7 +142,7 @@ Mozilla Public License 2.0 (MPL-2.0) - see the LICENSE file.
 
 ## Support & Community
 
-- **GitHub Issues**: [Report bugs and request features](https://github.com/mase1981/uc-intg-epson-pjlink/issues)
+- **GitHub Issues**: [Report bugs and request features](https://github.com/mase1981/uc-intg-epson/issues)
 - **UC Community Forum**: [General discussion and support](https://unfolded.community/)
 - **Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara)
 

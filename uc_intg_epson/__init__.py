@@ -19,9 +19,9 @@ async def main() -> None:
     from ucapi import DeviceStates
     from ucapi_framework import BaseConfigManager, get_config_path
 
-    from uc_intg_epson_pjlink.config import EpsonConfig, migrate_legacy_config
-    from uc_intg_epson_pjlink.driver import EpsonDriver
-    from uc_intg_epson_pjlink.setup_flow import EpsonSetupFlow
+    from uc_intg_epson.config import EpsonConfig, migrate_legacy_config
+    from uc_intg_epson.driver import EpsonDriver
+    from uc_intg_epson.setup_flow import EpsonSetupFlow
 
     level = os.getenv("UC_LOG_LEVEL", "INFO").upper()
     logging.basicConfig(

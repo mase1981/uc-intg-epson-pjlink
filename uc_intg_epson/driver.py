@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from ucapi_framework import BaseIntegrationDriver
 
-from uc_intg_epson_pjlink.config import EpsonConfig
-from uc_intg_epson_pjlink.device import EpsonDevice
-from uc_intg_epson_pjlink.media_player import create_media_player
-from uc_intg_epson_pjlink.remote import create_remote
-from uc_intg_epson_pjlink.select import create_selects
-from uc_intg_epson_pjlink.sensor import create_sensors
+from uc_intg_epson.config import EpsonConfig
+from uc_intg_epson.device import EpsonDevice
+from uc_intg_epson.media_player import create_media_player
+from uc_intg_epson.remote import create_remote
+from uc_intg_epson.select import create_selects
+from uc_intg_epson.sensor import create_sensors
 
 
 class EpsonDriver(BaseIntegrationDriver[EpsonDevice, EpsonConfig]):

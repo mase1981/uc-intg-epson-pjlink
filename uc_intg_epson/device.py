@@ -19,10 +19,10 @@ from typing import Any
 
 from ucapi_framework import PollingDevice
 
-from uc_intg_epson_pjlink import const, model_db, transport, wol
-from uc_intg_epson_pjlink.config import EpsonConfig
-from uc_intg_epson_pjlink.transport import ProjectorIdentity, ProjectorStatus, TransportAuthError
-from uc_intg_epson_pjlink.webcontrol import WebControlClient
+from uc_intg_epson import const, model_db, transport, wol
+from uc_intg_epson.config import EpsonConfig
+from uc_intg_epson.transport import ProjectorIdentity, ProjectorStatus, TransportAuthError
+from uc_intg_epson.webcontrol import WebControlClient
 
 _LOG = logging.getLogger(__name__)
 

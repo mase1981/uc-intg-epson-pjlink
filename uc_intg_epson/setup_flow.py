@@ -14,10 +14,10 @@ from typing import Any
 from ucapi import IntegrationSetupError, RequestUserInput, SetupError
 from ucapi_framework import BaseSetupFlow
 
-from uc_intg_epson_pjlink import model_db, transport
-from uc_intg_epson_pjlink.config import EpsonConfig, sanitize_identifier
-from uc_intg_epson_pjlink.const import PJLINK_PORT
-from uc_intg_epson_pjlink.transport import ProjectorIdentity, TransportAuthError
+from uc_intg_epson import model_db, transport
+from uc_intg_epson.config import EpsonConfig, sanitize_identifier
+from uc_intg_epson.const import PJLINK_PORT
+from uc_intg_epson.transport import ProjectorIdentity, TransportAuthError
 
 _LOG = logging.getLogger(__name__)
 

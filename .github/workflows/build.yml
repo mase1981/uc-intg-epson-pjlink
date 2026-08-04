@@ -7,7 +7,7 @@ name: "Build & Draft Release"
       - 'v*'
 
 env:
-  INTG_NAME: epson-pjlink
+  INTG_NAME: epson
   PYTHON_VER: 3.11.12-0.3.0
 
 jobs:
@@ -49,24 +49,24 @@ jobs:
                 --collect-all ucapi_framework \
                 --collect-all aiohttp \
                 --collect-all certifi \
-                --hidden-import uc_intg_epson_pjlink.driver \
-                --hidden-import uc_intg_epson_pjlink.device \
-                --hidden-import uc_intg_epson_pjlink.transport \
-                --hidden-import uc_intg_epson_pjlink.pjlink \
-                --hidden-import uc_intg_epson_pjlink.webcontrol \
-                --hidden-import uc_intg_epson_pjlink.escvpnet \
-                --hidden-import uc_intg_epson_pjlink.digest_auth \
-                --hidden-import uc_intg_epson_pjlink.model_db \
-                --hidden-import uc_intg_epson_pjlink.wol \
-                --hidden-import uc_intg_epson_pjlink.config \
-                --hidden-import uc_intg_epson_pjlink.setup_flow \
-                --hidden-import uc_intg_epson_pjlink.media_player \
-                --hidden-import uc_intg_epson_pjlink.remote \
-                --hidden-import uc_intg_epson_pjlink.select \
-                --hidden-import uc_intg_epson_pjlink.sensor \
-                --hidden-import uc_intg_epson_pjlink.const \
+                --hidden-import uc_intg_epson.driver \
+                --hidden-import uc_intg_epson.device \
+                --hidden-import uc_intg_epson.transport \
+                --hidden-import uc_intg_epson.pjlink \
+                --hidden-import uc_intg_epson.webcontrol \
+                --hidden-import uc_intg_epson.escvpnet \
+                --hidden-import uc_intg_epson.digest_auth \
+                --hidden-import uc_intg_epson.model_db \
+                --hidden-import uc_intg_epson.wol \
+                --hidden-import uc_intg_epson.config \
+                --hidden-import uc_intg_epson.setup_flow \
+                --hidden-import uc_intg_epson.media_player \
+                --hidden-import uc_intg_epson.remote \
+                --hidden-import uc_intg_epson.select \
+                --hidden-import uc_intg_epson.sensor \
+                --hidden-import uc_intg_epson.const \
                 --paths . \
-                uc_intg_epson_pjlink/__init__.py"
+                uc_intg_epson/__init__.py"
 
       - name: Prepare artifacts
         shell: bash
@@ -116,7 +116,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/uc-intg-epson-pjlink
+          images: ghcr.io/${{ github.repository_owner }}/uc-intg-epson
           tags: |
             type=ref,event=tag
             type=raw,value=latest
@@ -139,7 +139,7 @@ jobs:
     permissions:
       contents: write
     env:
-      INTG_NAME: epson-pjlink
+      INTG_NAME: epson
 
     steps:
       - name: Download build artifacts

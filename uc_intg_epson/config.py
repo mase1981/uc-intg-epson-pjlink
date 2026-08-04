@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass
 
 from ucapi_framework import BaseConfigManager
 
-from uc_intg_epson_pjlink import const
+from uc_intg_epson import const
 
 _LOG = logging.getLogger(__name__)
 

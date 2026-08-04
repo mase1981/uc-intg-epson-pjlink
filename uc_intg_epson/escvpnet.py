@@ -16,8 +16,8 @@ import asyncio
 import hashlib
 import logging
 
-from uc_intg_epson_pjlink import const
-from uc_intg_epson_pjlink.transport import (
+from uc_intg_epson import const
+from uc_intg_epson.transport import (
     ProjectorIdentity,
     ProjectorStatus,
     Transport,

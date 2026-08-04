@@ -1,20 +1,20 @@
 {
   "driver_id": "uc-intg-epson-pj",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "min_core_api": "0.22.0",
   "name": {
     "en": "Epson Projector"
   },
   "icon": "uc:projector",
   "description": {
-    "en": "Control network-connected Epson projectors over PJLink, with optional Web Control. Power, input/source selection, AV-mute, colour mode, Wake-on-LAN, plus model, serial, firmware, lamp/light-source hours and error-status sensors. Exposes a media player, a remote, source and colour-mode selects, and status sensors."
+    "en": "Control network-connected Epson projectors over PJLink, ESC/VP.net or Web Control (auto-detected). Power, input/source selection, AV-mute, colour mode, Wake-on-LAN, plus model, serial, firmware, lamp/light-source hours and error-status sensors. Exposes a media player, a remote, source and colour-mode selects, and status sensors."
   },
   "developer": {
     "name": "Meir Miyara",
     "email": "meir.miyara@gmail.com",
     "url": "https://github.com/mase1981"
   },
-  "home_page": "https://github.com/mase1981/uc-intg-epson-pjlink",
+  "home_page": "https://github.com/mase1981/uc-intg-epson",
   "release_date": "2026-08-04",
   "setup_data_schema": {
     "title": {

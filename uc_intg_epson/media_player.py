@@ -8,9 +8,9 @@ from typing import Any
 from ucapi import StatusCodes, media_player
 from ucapi_framework import MediaPlayerEntity
 
-from uc_intg_epson_pjlink import const
-from uc_intg_epson_pjlink.config import EpsonConfig
-from uc_intg_epson_pjlink.device import EpsonDevice
+from uc_intg_epson import const
+from uc_intg_epson.config import EpsonConfig
+from uc_intg_epson.device import EpsonDevice
 
 _LOG = logging.getLogger(__name__)
 

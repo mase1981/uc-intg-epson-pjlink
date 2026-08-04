@@ -18,9 +18,9 @@ import re
 
 import aiohttp
 
-from uc_intg_epson_pjlink import const
-from uc_intg_epson_pjlink.digest_auth import DigestAuth
-from uc_intg_epson_pjlink.transport import ProjectorIdentity, ProjectorStatus, Transport
+from uc_intg_epson import const
+from uc_intg_epson.digest_auth import DigestAuth
+from uc_intg_epson.transport import ProjectorIdentity, ProjectorStatus, Transport
 
 _LOG = logging.getLogger(__name__)
 

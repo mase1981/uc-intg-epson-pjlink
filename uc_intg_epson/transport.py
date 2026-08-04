@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from uc_intg_epson_pjlink import const
+from uc_intg_epson import const
 
 # Protocol identifiers (stored in config.protocol)
 PROTOCOL_AUTO = "auto"
@@ -103,9 +103,9 @@ def build_candidates(config) -> list[Transport]:
     ``auto`` returns PJLink, then ESC/VP.net, then Web Control. A specific
     protocol returns just that one. Imports are local to avoid an import cycle.
     """
-    from uc_intg_epson_pjlink.escvpnet import ESCVPNetTransport
-    from uc_intg_epson_pjlink.pjlink import PJLinkTransport
-    from uc_intg_epson_pjlink.webcontrol import WebControlTransport
+    from uc_intg_epson.escvpnet import ESCVPNetTransport
+    from uc_intg_epson.pjlink import PJLinkTransport
+    from uc_intg_epson.webcontrol import WebControlTransport
 
     protocol = getattr(config, "protocol", "") or PROTOCOL_AUTO
 
