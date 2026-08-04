@@ -17,9 +17,9 @@ Control your **network-connected Epson projectors** directly from your Unfolded 
 
 Network-connected Epson projectors, including the **Home Cinema / EH-TW** series, the **LS / QB laser** flagships (e.g. LS12000, QB1000), and **EB / PowerLite** business projectors. The integration speaks three protocols and picks whichever the projector supports:
 
-- **PJLink** (TCP 4352) — common on business/large-venue models and many home models.
-- **ESC/VP.net** (TCP 3629) — Epson's native protocol; used by consumer home-cinema models that don't expose PJLink.
-- **Web Control** (HTTP) — the Epson web interface; also usable for control.
+- **PJLink** (TCP 4352) - common on business/large-venue models and many home models.
+- **ESC/VP.net** (TCP 3629) - Epson's native protocol; used by consumer home-cinema models that don't expose PJLink.
+- **Web Control** (HTTP) - the Epson web interface; also usable for control.
 
 The projector must have **network control enabled** and be reachable on the LAN. Model, serial and firmware are auto-detected where the protocol provides them.
 
