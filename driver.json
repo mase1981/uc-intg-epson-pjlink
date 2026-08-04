@@ -1,17 +1,21 @@
 {
   "driver_id": "uc-intg-epson-pj",
-  "version": "1.0.1",
-  "min_core_api": "0.3.1",
+  "version": "2.0.0",
+  "min_core_api": "0.22.0",
   "name": {
-    "en": "Epson Projector Controls"
+    "en": "Epson Projector"
   },
   "icon": "uc:projector",
   "description": {
-    "en": "Control your network-connected Epson Projector via the PJLink protocol."
+    "en": "Control network-connected Epson projectors over PJLink, with optional Web Control. Power, input/source selection, AV-mute, colour mode, Wake-on-LAN, plus model, serial, firmware, lamp/light-source hours and error-status sensors. Exposes a media player, a remote, source and colour-mode selects, and status sensors."
   },
   "developer": {
-    "name": "Meir Miyara"
+    "name": "Meir Miyara",
+    "email": "meir.miyara@gmail.com",
+    "url": "https://github.com/mase1981"
   },
+  "home_page": "https://github.com/mase1981/uc-intg-epson-pjlink",
+  "release_date": "2026-08-04",
   "setup_data_schema": {
     "title": {
       "en": "Epson Projector Setup"
@@ -20,12 +24,12 @@
       {
         "id": "info",
         "label": {
-          "en": "Setup Process"
+          "en": "Epson Projector (PJLink)"
         },
         "field": {
           "label": {
             "value": {
-              "en": "This integration allows you to control Epson projectors on your network using the PJLink protocol. You will be asked to provide the projector's IP address on the next screen."
+              "en": "On the next screen, enter your Epson projector's IP address. PJLink must be enabled on the projector. Optionally provide a Web Control password (unlocks colour-mode control) and a MAC address (enables Wake-on-LAN power-on from standby)."
             }
           }
         }

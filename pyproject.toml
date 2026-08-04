@@ -1,18 +1,42 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "uc-intg-epson-pj"
-version = "0.1.0"
-authors = [
-  { name="Meir Miyara", email="meir.miyara@email.com" },
-]
-description = "Unfolded Circle integration for Epson projectors"
+name = "uc-intg-epson-pjlink"
+version = "2.0.0"
+description = "Epson projector (PJLink + Web Control) integration for Unfolded Circle Remote Two/3"
 readme = "README.md"
-requires-python = ">=3.9"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+requires-python = ">=3.11"
+license = {text = "MPL-2.0"}
+authors = [
+    {name = "Meir Miyara", email = "meir.miyara@gmail.com"}
 ]
+keywords = ["epson", "projector", "pjlink", "media-player", "unfolded-circle", "remote", "integration"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Home Automation",
+    "Topic :: Multimedia",
+]
+dependencies = [
+    "ucapi>=0.7.0",
+    "ucapi-framework>=1.9.5",
+    "aiohttp>=3.9.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/mase1981/uc-intg-epson-pjlink"
+"Bug Reports" = "https://github.com/mase1981/uc-intg-epson-pjlink/issues"
+"Source" = "https://github.com/mase1981/uc-intg-epson-pjlink"
+
+[tool.setuptools.packages.find]
+include = ["uc_intg_epson_pjlink*"]
+
+[tool.setuptools.package-data]
+uc_intg_epson_pjlink = ["*.json"]

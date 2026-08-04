@@ -14,28 +14,19 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
@@ -44,27 +35,47 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
-nosetests.xml
 coverage.xml
 *.cover
-*.py,cover
-.hypothesis/
 .pytest_cache/
-cover/
 
-# Environments
+# Virtual environments
 .env
 .venv
 env/
 venv/
 ENV/
-env.bak/
-venv.bak/
 
-# IDE files
+# IDEs
 .idea/
 .vscode/
 
-# Local Files
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Runtime configuration (created by the framework at runtime)
 config.json
 config/
+data/
+*.log
+
+# OS generated files
+.DS_Store
+._*
+Thumbs.db
+
+# Local dev scripts / probes (keep local only)
+_probe.py
+
+# Testing / simulator files (keep local only, never push)
+tests/
+simulator/
+artifacts/
+tools/
+
+# Claude (local only, never commit)
+.claude/
+knowledge-base/
+*.knowledge.md

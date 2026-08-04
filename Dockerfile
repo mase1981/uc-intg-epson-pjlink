@@ -1,20 +1,24 @@
-FROM python:3.11-slim
+FROM python:3.11-slim-bullseye
 
 WORKDIR /app
 
-
-COPY driver.json .
-COPY requirements.txt .
-COPY ./uc_intg_epson_pj/ ./uc_intg_epson_pj/
-
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./requirements.txt requirements.txt
+RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
+RUN mkdir /config
 
 ADD . .
 
 ENV UC_DISABLE_MDNS_PUBLISH="false"
 ENV UC_MDNS_LOCAL_HOSTNAME=""
-ENV UC_INTEGRATION_INTERFACE="0.0.0.0"
-ENV UC_INTEGRATION_HTTP_PORT="9099"
-ENV UC_CONFIG_HOME="/config"
 
-CMD ["python", "-m", "uc_intg_epson_pj.driver"]
+ENV UC_INTEGRATION_INTERFACE="0.0.0.0"
+ENV UC_INTEGRATION_HTTP_PORT="9090"
+
+ENV UC_CONFIG_HOME="/config"
+ENV PYTHONUNBUFFERED=1
+
+LABEL org.opencontainers.image.source="https://github.com/mase1981/uc-intg-epson-pjlink"
+LABEL org.opencontainers.image.description="Epson projector (PJLink + Web Control) integration for Unfolded Circle Remote"
+LABEL org.opencontainers.image.licenses=MPL-2.0
+
+CMD ["python3", "-u", "-m", "uc_intg_epson_pjlink"]

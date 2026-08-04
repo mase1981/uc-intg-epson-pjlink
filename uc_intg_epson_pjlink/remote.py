@@ -1,90 +1,106 @@
+"""Epson projector remote entity - power, inputs and AV-mute for activities."""
+
+from __future__ import annotations
+
 import logging
-import asyncio
 from typing import Any
 
-import ucapi
-from ucapi import MediaPlayer, Remote, media_player, remote, EntityTypes, StatusCodes
-from ucapi.media_player import Attributes as MediaAttr
-from ucapi.remote import Attributes as RemoteAttr
-from ucapi.media_player import Features as MediaFeatures
-from ucapi.remote import Features as RemoteFeatures
-from ucapi.media_player import States as MediaStates
-from ucapi.remote import States as RemoteStates
+from ucapi import StatusCodes, remote
+from ucapi.ui import Buttons, Size, UiPage, create_btn_mapping, create_ui_icon, create_ui_text
+from ucapi_framework import RemoteEntity
 
-from config import EpsonDevice, create_entity_id
-from projector import EpsonProjector, PowerState
-import const
+from uc_intg_epson_pjlink import const
+from uc_intg_epson_pjlink.config import EpsonConfig
+from uc_intg_epson_pjlink.device import EpsonDevice
 
-_LOGGER = logging.getLogger(__name__)
+_LOG = logging.getLogger(__name__)
 
-class EpsonMediaPlayer(MediaPlayer):
-    def __init__(self, config_device: EpsonDevice, device: EpsonProjector):
+SIMPLE_COMMANDS = [
+    "POWER", "POWER_ON", "POWER_OFF",
+    "HDMI_1", "HDMI_2",
+    "AV_MUTE_ON", "AV_MUTE_OFF", "AV_MUTE_TOGGLE",
+]
+
+
+class EpsonRemote(RemoteEntity):
+    """Projector power / input / AV-mute as simple commands + a UI page."""
+
+    def __init__(self, device_config: EpsonConfig, device: EpsonDevice) -> None:
         self._device = device
-        self.config = config_device
-        entity_id = create_entity_id(config_device.identifier, EntityTypes.MEDIA_PLAYER)
+        entity_id = f"remote.{device_config.identifier}"
         super().__init__(
-            identifier=entity_id,
-            name=f"{config_device.name}",
-            features=[MediaFeatures.ON_OFF],
-            attributes={MediaAttr.STATE: device.state},
-            cmd_handler=self.command_handler,
+            entity_id,
+            f"{device_config.name} Remote",
+            [remote.Features.ON_OFF, remote.Features.TOGGLE, remote.Features.SEND_CMD],
+            {remote.Attributes.STATE: remote.States.UNKNOWN},
+            simple_commands=SIMPLE_COMMANDS,
+            button_mapping=[
+                create_btn_mapping(Buttons.POWER, short="POWER"),
+                create_btn_mapping(Buttons.HOME, short="AV_MUTE_TOGGLE"),
+                create_btn_mapping(Buttons.BLUE, short="HDMI_1"),
+                create_btn_mapping(Buttons.YELLOW, short="HDMI_2"),
+            ],
+            ui_pages=[
+                UiPage("main", "Projector", grid=Size(4, 6), items=[
+                    create_ui_icon("uc:power-on", 0, 0, cmd="POWER_ON"),
+                    create_ui_icon("uc:power-off", 3, 0, cmd="POWER_OFF"),
+                    create_ui_text("HDMI 1", 0, 2, size=Size(2, 1), cmd="HDMI_1"),
+                    create_ui_text("HDMI 2", 2, 2, size=Size(2, 1), cmd="HDMI_2"),
+                    create_ui_text("AV Mute", 0, 4, size=Size(2, 1), cmd="AV_MUTE_TOGGLE"),
+                    create_ui_text("Show", 2, 4, size=Size(2, 1), cmd="AV_MUTE_OFF"),
+                ]),
+            ],
+            cmd_handler=self._handle_command,
         )
+        self.subscribe_to_device(device)
 
-    async def command_handler(
-        self, entity: MediaPlayer, cmd_id: str, params: dict[str, Any] | None
-    ) -> ucapi.StatusCodes:
-        if cmd_id == media_player.Commands.ON:
-            await self._device.set_power('on')
-        elif cmd_id == media_player.Commands.OFF:
-            await self._device.set_power('off')
-        else:
-            return StatusCodes.NOT_IMPLEMENTED
-        await asyncio.sleep(2)
-        await self._device.update()
-        return StatusCodes.OK
+    async def sync_state(self) -> None:
+        if self._device.state == const.STATE_UNAVAILABLE:
+            self.update({remote.Attributes.STATE: remote.States.UNAVAILABLE})
+            return
+        self.update({
+            remote.Attributes.STATE: remote.States.ON if self._device.power else remote.States.OFF,
+        })
 
-class EpsonRemote(Remote):
-    def __init__(self, config_device: EpsonDevice, device: EpsonProjector):
-        self._device = device
-        entity_id = create_entity_id(config_device.identifier, EntityTypes.REMOTE)
-        super().__init__(
-            identifier=entity_id,
-            name=f"{config_device.name} Remote",
-            features=[RemoteFeatures.ON_OFF],
-            attributes={
-                RemoteAttr.STATE: _device_state_to_remote_state(device.state),
-            },
-            ui_pages=self._create_ui_pages(),
-            cmd_handler=self.command_handler,
-        )
-
-    def _create_ui_pages(self) -> list[ucapi.ui.UiPage]:
-        page1 = ucapi.ui.UiPage("main", "Controls", grid=ucapi.ui.Size(2, 2))
-        page1.add(ucapi.ui.create_ui_text("Power On", 0, 0, cmd=remote.Commands.ON))
-        page1.add(ucapi.ui.create_ui_text("Power Off", 1, 0, cmd=remote.Commands.OFF))
-        page1.add(ucapi.ui.create_ui_text("HDMI 1", 0, 1, cmd=remote.create_send_cmd(const.INPUT_HDMI1)))
-        page1.add(ucapi.ui.create_ui_text("HDMI 2", 1, 1, cmd=remote.create_send_cmd(const.INPUT_HDMI2)))
-        return [page1]
-
-    async def command_handler(
-        self, entity: Remote, cmd_id: str, params: dict[str, Any] | None = None
+    async def _handle_command(
+        self, entity: Any, cmd_id: str, params: dict | None = None, *_a: Any
     ) -> StatusCodes:
-        if cmd_id == remote.Commands.ON:
-            await self._device.set_power('on')
-        elif cmd_id == remote.Commands.OFF:
-            await self._device.set_power('off')
-        elif cmd_id == remote.Commands.SEND_CMD:
-            command_to_send = params.get("command") if params else None
-            if command_to_send:
-                await self._device.send_raw_command(command_to_send)
-            else:
-                return StatusCodes.BAD_REQUEST
-        else:
-            return StatusCodes.NOT_IMPLEMENTED
-        await asyncio.sleep(2)
-        return StatusCodes.OK
+        try:
+            if cmd_id == remote.Commands.ON:
+                return StatusCodes.OK if await self._device.power_on() else StatusCodes.SERVER_ERROR
+            if cmd_id == remote.Commands.OFF:
+                return StatusCodes.OK if await self._device.power_off() else StatusCodes.SERVER_ERROR
+            if cmd_id == remote.Commands.TOGGLE:
+                return StatusCodes.OK if await self._device.toggle_power() else StatusCodes.SERVER_ERROR
+            if cmd_id != remote.Commands.SEND_CMD:
+                return StatusCodes.NOT_IMPLEMENTED
+            return await self._run((params or {}).get("command", ""))
+        except Exception as err:  # pylint: disable=broad-exception-caught
+            _LOG.error("[%s] Remote command error (%s): %s", entity.id, cmd_id, err)
+            return StatusCodes.SERVER_ERROR
 
-def _device_state_to_remote_state(device_state: PowerState) -> RemoteStates:
-    if device_state == PowerState.ON:
-        return RemoteStates.ON
-    return RemoteStates.OFF
+    async def _run(self, command: str) -> StatusCodes:
+        # Backward compatibility: the previous integration sent raw PJLink
+        # strings (e.g. "%1INPT 32") through send_cmd.
+        if command.startswith("%"):
+            return StatusCodes.OK if await self._device.send_raw(command) else StatusCodes.SERVER_ERROR
+
+        actions = {
+            "POWER": self._device.toggle_power,
+            "POWER_ON": self._device.power_on,
+            "POWER_OFF": self._device.power_off,
+            "HDMI_1": lambda: self._device.send_raw(const.CMD_SET_INPUT.format(code="32")),
+            "HDMI_2": lambda: self._device.send_raw(const.CMD_SET_INPUT.format(code="33")),
+            "AV_MUTE_ON": lambda: self._device.set_av_mute(True),
+            "AV_MUTE_OFF": lambda: self._device.set_av_mute(False),
+            "AV_MUTE_TOGGLE": self._device.toggle_av_mute,
+        }
+        action = actions.get(command)
+        if not action:
+            return StatusCodes.NOT_IMPLEMENTED
+        ok = await action()
+        return StatusCodes.OK if ok else StatusCodes.SERVER_ERROR
+
+
+def create_remote(device_config: EpsonConfig, device: EpsonDevice) -> list[EpsonRemote]:
+    return [EpsonRemote(device_config, device)]

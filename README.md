@@ -1,6 +1,6 @@
-# Epson Projector (PJLink) Integration for Unfolded Circle Remote 2/3
+# Epson Projector Integration for Unfolded Circle Remote 2/3
 
-Control your network-connected Epson projectors directly from your Unfolded Circle Remote 2 or Remote 3 using the PJLink protocol with **IP control**, **power management**, and **input switching**.
+Control your **network-connected Epson projectors** directly from your Unfolded Circle Remote 2 or Remote 3. Power, input/source switching, AV-mute, colour mode, Wake-on-LAN, and rich status sensors (model, serial, firmware, lamp/light-source hours, error status) - all over the local network via **PJLink**, with optional **Epson Web Control**. No IR emitters required.
 
 ![Epson](https://img.shields.io/badge/Epson-Projector-blue)
 [![GitHub Release](https://img.shields.io/github/v/release/mase1981/uc-intg-epson-pjlink?style=flat-square)](https://github.com/mase1981/uc-intg-epson-pjlink/releases)
@@ -13,10 +13,20 @@ Control your network-connected Epson projectors directly from your Unfolded Circ
 [![PayPal](https://img.shields.io/badge/PayPal-donate-blue.svg?style=flat-square)](https://paypal.me/mmiyara)
 [![Github Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?&logo=GitHub-Sponsors&logoColor=EA4AAA&style=flat-square)](https://github.com/sponsors/mase1981)
 
+## Supported Devices
+
+Network-connected Epson projectors that support **PJLink** (enabled by default on most models), including the **Home Cinema / EH-TW** series, the **LS / QB laser** flagships (e.g. LS12000, QB1000), and **EB / PowerLite** business projectors. The model, serial and firmware are detected automatically from the projector. Optional **Epson Web Control** features (colour mode) require the projector's Web Control password.
 
 ## Features
 
-This integration provides IP control of network-connected Epson projectors using the PJLink protocol, delivering direct control without IR emitters.
+- **🎥 Full media player** - power on/off/toggle, current input + selectable source list, and AV-mute (mute/unmute/toggle), with warm-up and cool-down state feedback.
+- **🔀 Source switching** - the input list is built automatically from the projector's own reported inputs (PJLink `INST`).
+- **🎛️ Remote entity** - a ready-made button page (power, HDMI 1/2, AV-mute) plus power/input simple commands for Activities. Accepts raw PJLink commands via `send_cmd`.
+- **🎨 Colour mode** - pick the picture preset (Cinema, Natural, Dynamic, …) via Web Control (added only when a Web Control password is provided).
+- **📊 Status sensors** - Lamp / Light-Source Hours, Model, Serial Number, Firmware, Input, and Status (error summary).
+- **⏰ Wake-on-LAN** - optional magic-packet wake so the projector can be powered on from deep standby.
+- **🔎 Automatic model detection** - laser models are labelled "Light Source Hours", lamp models "Lamp Hours".
+- **Multi-device** - add each projector on your network.
 
 ---
 ## ❤️ Support Development ❤️
@@ -30,152 +40,96 @@ If you find this integration useful, consider supporting development:
 Your support helps maintain this integration. Thank you! ❤️
 ---
 
-### 🎥 **Projector Control**
+## How It Works
 
-#### **Power Management**
-- **Power On/Off** - Turn projector on and off (standby)
-- **State Feedback** - Real-time power state monitoring
-- **State Polling** - Periodic status checks for UI updates
+Control is **fully local** over the projector's network connection:
 
-#### **Input Switching**
-- **HDMI 1** - Direct selection of HDMI input 1
-- **HDMI 2** - Direct selection of HDMI input 2
-- **Quick Switching** - Fast input changes via custom UI
+- **PJLink** (TCP 4352) is the mandatory transport - power, inputs, AV-mute, lamp/filter hours, device identity and error status.
+- **Epson Web Control** (HTTP) is an optional, password-gated enhancement that adds colour-mode control and a standby power-on path for models that keep HTTP alive while PJLink is closed.
+- For power-on while the projector is in standby, set the projector's Standby/Network setting to **"Communication On"** so the network stays reachable. If your model closes the network in standby, provide the projector's **MAC address** to enable Wake-on-LAN.
 
-#### **Network Control**
-- **IP Control** - No IR emitters required
-- **PJLink Protocol** - Standard projector control protocol
-- **Password Support** - Supports PJLink password authentication
-- **Persistent Configuration** - Remembers settings between restarts
+## Requirements
 
-### 🎮 **Entities**
-
-This integration creates two distinct entities:
-
-#### **MediaPlayer Entity**
-- Used to determine projector state
-- Provides status information
-- Updates automatically with state changes
-
-#### **Remote Entity**
-- Custom UI with control buttons
-- Direct control of power and inputs
-- Optimized button layout
-
-### **Protocol Requirements**
-
-- **Protocol**: PJLink
-- **Network Access**: Projector must be on same local network
-- **IP Address**: Static IP or DHCP reservation recommended
-- **Password**: Optional PJLink password support
-
-### **Network Requirements**
-
-- **Local Network Access** - Integration requires same network as projector
-- **IP Control** - Direct network communication via PJLink
-- **Static IP Recommended** - Projector should have static IP or DHCP reservation
+- An Epson projector with **PJLink enabled**, on the same network as your Remote.
+- A **static IP** or DHCP reservation for the projector (strongly recommended).
+- (Optional) the **PJLink password** and/or **Web Control password** if configured on the projector.
+- Unfolded Circle Remote 2 / 3 with firmware supporting custom integrations.
 
 ## Installation
 
 ### Option 1: Remote Web Interface (Recommended)
-1. Navigate to the [**Releases**](https://github.com/mase1981/uc-intg-epson-pjlink/releases) page
-2. Download the latest `uc-intg-epson-pjlink-<version>-aarch64.tar.gz` file
-3. Open your remote's web interface (`http://your-remote-ip`)
-4. Go to **Settings** → **Integrations** → **Add Integration**
-5. Click **Upload** and select the downloaded `.tar.gz` file
+
+1. Download the latest `uc-intg-epson-pjlink-<version>-aarch64.tar.gz` from the [**Releases**](https://github.com/mase1981/uc-intg-epson-pjlink/releases) page.
+2. Open your Remote's web interface (`http://your-remote-ip`).
+3. Go to **Settings -> Integrations -> Add Integration -> Install Custom** and upload the `.tar.gz`.
 
 ### Option 2: Docker (Advanced Users)
 
-The integration is available as a pre-built Docker image:
+**Image**: `ghcr.io/mase1981/uc-intg-epson-pjlink:latest`
 
 **Docker Compose:**
 ```yaml
 services:
   uc-intg-epson-pjlink:
-    image: mase1981/uc-intg-epson-pjlink:latest
+    image: ghcr.io/mase1981/uc-intg-epson-pjlink:latest
     container_name: uc-intg-epson-pjlink
     network_mode: host
     volumes:
-      - </local/path>:/data
+      - ./config:/config
     environment:
-      - UC_CONFIG_HOME=/data
+      - UC_CONFIG_HOME=/config
       - UC_INTEGRATION_HTTP_PORT=9090
       - UC_INTEGRATION_INTERFACE=0.0.0.0
-      - PYTHONPATH=/app
     restart: unless-stopped
 ```
 
 **Docker Run:**
 ```bash
-docker run -d --name uc-epson-pjlink --restart unless-stopped --network host -v epson-config:/app/config -e UC_CONFIG_HOME=/app/config -e UC_INTEGRATION_INTERFACE=0.0.0.0 -e UC_INTEGRATION_HTTP_PORT=9090 -e PYTHONPATH=/app mase1981/uc-intg-epson-pjlink:latest
+docker run -d --name uc-intg-epson-pjlink --restart unless-stopped --network host -v $(pwd)/config:/config -e UC_CONFIG_HOME=/config -e UC_INTEGRATION_INTERFACE=0.0.0.0 -e UC_INTEGRATION_HTTP_PORT=9090 ghcr.io/mase1981/uc-intg-epson-pjlink:latest
 ```
 
 ## Configuration
 
-### Step 1: Prepare Your Epson Projector
+1. Start setup and enter your projector's details:
+   - **Projector Name** - a friendly name (e.g. "Cinema Projector").
+   - **IP Address** and **PJLink Port** (default `4352`).
+   - **PJLink Password** - optional.
+   - **Web Control Password** - optional; unlocks colour-mode control.
+   - **MAC Address** - optional; enables Wake-on-LAN.
+2. The integration validates the connection, auto-detects the model, and creates the entities.
+3. Repeat setup to add additional projectors.
 
-**IMPORTANT**: Projector must be powered on and connected to your network before adding the integration.
+For each projector the integration creates:
 
-#### Verify Network Connection:
-1. Check that projector is connected to network (Ethernet or Wi-Fi)
-2. Note the IP address from projector's network settings
-3. Ensure PJLink is enabled (usually enabled by default)
-4. Note the PJLink password if configured (optional)
+| Entity | Purpose |
+|--------|---------|
+| **Media player** (`<name>`) | Power, current source + source list, AV-mute. |
+| **Remote** (`<name> Remote`) | Power, HDMI 1/2 and AV-mute on a button page + simple commands for Activities. |
+| **Select** (`<name> Source`) | Pick the active input. |
+| **Select** (`<name> Color Mode`) | Pick the picture preset (only with a Web Control password). |
+| **Sensors** | Lamp / Light-Source Hours, Model, Serial Number, Firmware, Input, Status. |
 
-#### Network Setup:
-- **Wired Connection**: Recommended for stability
-- **Static IP**: Recommended via DHCP reservation
-- **Network Isolation**: Must be on same subnet as Remote
-- **PJLink Access**: Ensure PJLink is not blocked by projector settings
+> **Upgrading from v1.x?** Existing setups are migrated automatically - your projector and entity IDs are preserved, so Activities keep working. No re-pairing required.
 
-### Step 2: Setup Integration
+## Troubleshooting
 
-1. After installation, go to **Settings** → **Integrations**
-2. The Epson Projector (PJLink) integration should appear in **Available Integrations**
-3. Click **"Configure"** to begin setup:
-
-#### **Configuration:**
-- **Name**: Friendly name for the projector (e.g., "Living Room Projector")
-- **IP Address**: Enter projector IP (e.g., 192.168.1.100)
-- **Password**: PJLink password (leave blank if not set)
-- Click **Complete Setup**
-
-4. Integration will create **two entities**:
-   - **[Projector Name]** - MediaPlayer entity for status
-   - **[Projector Name] Remote** - Remote entity with control buttons
-
-## Using the Integration
-
-### Remote Entity
-
-Add the **Remote** entity to your UI for complete control:
-
-- **Power Controls**: Turn On, Turn Off buttons
-- **Input Controls**: HDMI 1, HDMI 2 direct selection
-- **Custom UI Pages**: Organized control layout
-- **Visual Feedback**: Button states reflect projector status
-
-### MediaPlayer Entity
-
-The MediaPlayer entity provides:
-
-- **Status Monitoring**: Current projector state
-- **Activity Integration**: Use in UC activities for automation
-- **State Feedback**: Real-time power and input status
-
-**Important Note**: Add the **Remote** entity to your UI. The MediaPlayer is primarily for status and activities.
+| Symptom | Fix |
+|---------|-----|
+| "Connection refused" / cannot connect | Ensure PJLink is enabled and the projector is reachable. Many Epson models close the network in standby - set Standby/Network to **"Communication On"**, and/or add the MAC address for Wake-on-LAN. |
+| Setup fails with an authorization error | The projector has a PJLink password set - enter it during setup. |
+| Colour Mode entity missing | It is only created when a **Web Control password** is provided at setup. |
+| Sensors show "N/A" while the projector is off | Some values (input, colour mode) are only available while the projector is powered on. |
+| Source switch does nothing | Only inputs the projector actually reports (PJLink `INST`) are selectable. |
 
 ## Credits
 
 - **Developer**: Meir Miyara
-- **Unfolded Circle**: Remote 2/3 integration framework (ucapi)
-- **PJLink Protocol**: Standard projector control protocol
-- **Community**: Testing and feedback from UC community
-- **Inspiration**: Jack Powell (uc-intg-jvc), kennymc-c (ucr2-integration-requests)
+- **PJLink**: standard projector control protocol; Epson Web Control for extended features.
+- **Unfolded Circle**: Remote 2/3 integration framework ([ucapi](https://github.com/unfoldedcircle/integration-python-library) / [ucapi-framework](https://github.com/JackJPowell/ucapi-framework)).
 
 ## License
 
-This project is licensed under the Mozilla Public License 2.0 (MPL-2.0) - see LICENSE file for details.
+Mozilla Public License 2.0 (MPL-2.0) - see the LICENSE file.
 
 ## Support & Community
 
