@@ -48,6 +48,7 @@ class EpsonDevice(PollingDevice):
         self._color_mode: str | None = None
         self._identity_loaded = False
         self._fail_count = 0
+        self._auth_logged = False  # a refused password is logged once, not every poll
 
     # Keep the last-known state through this many consecutive failed polls
     # before reporting UNAVAILABLE (projectors drop the network briefly during
@@ -198,7 +199,7 @@ class EpsonDevice(PollingDevice):
             self._identity_loaded = True
             await self._persist_identity()
         except TransportAuthError:
-            _LOG.error("[%s] Authentication failed on %s", self.log_id, self._transport.name)
+            self._log_auth_failure()
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.info("[%s] Identity not available yet: %s", self.log_id, err)
 
@@ -206,13 +207,14 @@ class EpsonDevice(PollingDevice):
         try:
             new_status = await self._transport.poll()
         except TransportAuthError:
-            _LOG.error("[%s] Authentication failed on %s", self.log_id, self._transport.name)
+            self._log_auth_failure()
             new_status = ProjectorStatus()
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.debug("[%s] Poll failed: %s", self.log_id, err)
             new_status = ProjectorStatus()
 
         if new_status.reachable:
+            self._auth_logged = False
             # A single command in the poll may transiently fail to read; keep the
             # last good value rather than flashing "N/A".
             if new_status.lamp_hours is None:
@@ -238,6 +240,16 @@ class EpsonDevice(PollingDevice):
                 self._color_mode = await self._web.get_color_mode()
             except Exception:  # pylint: disable=broad-exception-caught
                 self._color_mode = None
+
+    def _log_auth_failure(self) -> None:
+        if self._auth_logged:
+            return
+        self._auth_logged = True
+        _LOG.error(
+            "[%s] The projector refused the password on %s. Run the integration setup again "
+            "and choose Update to correct it (no need to remove the integration).",
+            self.log_id, self._transport.name,
+        )
 
     async def _persist_identity(self) -> None:
         updates: dict[str, Any] = {}

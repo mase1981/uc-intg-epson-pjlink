@@ -1,6 +1,6 @@
 {
   "driver_id": "uc-intg-epson-pj",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "min_core_api": "0.22.0",
   "name": {
     "en": "Epson Projector"
@@ -15,7 +15,7 @@
     "url": "https://github.com/mase1981"
   },
   "home_page": "https://github.com/mase1981/uc-intg-epson",
-  "release_date": "2026-08-04",
+  "release_date": "2026-10-04",
   "setup_data_schema": {
     "title": {
       "en": "Epson Projector Setup"

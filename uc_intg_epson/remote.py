@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Any
 
@@ -72,9 +73,29 @@ class EpsonRemote(RemoteEntity):
                 return StatusCodes.OK if await self._device.power_off() else StatusCodes.SERVER_ERROR
             if cmd_id == remote.Commands.TOGGLE:
                 return StatusCodes.OK if await self._device.toggle_power() else StatusCodes.SERVER_ERROR
-            if cmd_id != remote.Commands.SEND_CMD:
+            params = params or {}
+            if cmd_id == remote.Commands.SEND_CMD:
+                commands = [params.get("command", "")]
+            elif cmd_id == remote.Commands.SEND_CMD_SEQUENCE:
+                commands = params.get("sequence") or []
+                if isinstance(commands, str):
+                    commands = commands.split(",")
+            else:
                 return StatusCodes.NOT_IMPLEMENTED
-            return await self._run((params or {}).get("command", ""))
+            commands = [str(command).strip() for command in commands if str(command).strip()]
+            if not commands:
+                return StatusCodes.BAD_REQUEST
+            repeat, delay = _repeat_delay(params)
+            first = True
+            for _ in range(repeat):
+                for command in commands:
+                    if not first and delay:
+                        await asyncio.sleep(delay)
+                    first = False
+                    status = await self._run(command)
+                    if status != StatusCodes.OK:
+                        return status
+            return StatusCodes.OK
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.error("[%s] Remote command error (%s): %s", entity.id, cmd_id, err)
             return StatusCodes.SERVER_ERROR
@@ -95,11 +116,24 @@ class EpsonRemote(RemoteEntity):
             "AV_MUTE_OFF": lambda: self._device.set_av_mute(False),
             "AV_MUTE_TOGGLE": self._device.toggle_av_mute,
         }
-        action = actions.get(command)
+        action = actions.get(command) or actions.get(command.upper())
         if not action:
             return StatusCodes.NOT_IMPLEMENTED
         ok = await action()
         return StatusCodes.OK if ok else StatusCodes.SERVER_ERROR
+
+
+def _repeat_delay(params: dict[str, Any]) -> tuple[int, float]:
+    """Repeat count (at least 1) and delay in seconds from the command parameters."""
+    try:
+        repeat = max(1, int(params.get("repeat") or 1))
+    except (TypeError, ValueError):
+        repeat = 1
+    try:
+        delay = max(0, int(params.get("delay") or 0)) / 1000
+    except (TypeError, ValueError):
+        delay = 0.0
+    return repeat, delay
 
 
 def create_remote(device_config: EpsonConfig, device: EpsonDevice) -> list[EpsonRemote]:
